@@ -1,0 +1,40 @@
+name: CI - Hola Mundo con Cowsay y actions
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar Cowsay
+        run: npm install -g cowsay
+
+      - name: Ejecutar Hola Mundo
+        run: node index.js
+
+      - name: Generar mensaje con Cowsay
+        run: |
+          cowsay "Hola Mundo desde GitHub Actions! Te los manda Lorelvis Santos" > cowsay.txt
+          cat cowsay.txt
+
+      - name: Enviar Cowsay a ntfy
+        if: always()
+        run: |
+          curl \
+            -H "Title: GitHub Actions - Cowsay" \
+            -H "Priority: default" \
+            -H "Tags: github,ci,cow" \
+            --data-binary @cowsay.txt \
+            https://ntfy.sh/devops-itla
